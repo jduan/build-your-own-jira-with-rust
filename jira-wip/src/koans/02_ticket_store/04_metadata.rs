@@ -30,8 +30,10 @@ mod metadata {
             }
         }
 
-        pub fn save(&mut self, ticket: Ticket) -> TicketId {
+        pub fn save(&mut self, mut ticket: Ticket) -> TicketId {
             let id = self.generate_id();
+            ticket.set_id(id);
+            ticket.set_created_at(Utc::now());
             self.data.insert(id, ticket);
             id
         }
@@ -48,12 +50,22 @@ mod metadata {
 
     #[derive(Debug, Clone, PartialEq)]
     pub struct Ticket {
+        id: Option<TicketId>,
         title: String,
         description: String,
         status: Status,
+        created_at: Option<DateTime<Utc>>,
     }
 
     impl Ticket {
+        pub fn set_id(&mut self, id: TicketId) {
+            self.id = Some(id);
+        }
+
+        pub fn set_created_at(&mut self, created_at: DateTime<Utc>) {
+            self.created_at = Some(created_at);
+        }
+
         pub fn title(&self) -> &String {
             &self.title
         }
@@ -67,13 +79,13 @@ mod metadata {
         }
 
         // The datetime when the ticket was saved in the store, if it was saved.
-        pub fn created_at(&self) -> __ {
-           todo!()
+        pub fn created_at(&self) -> Option<DateTime<Utc>> {
+            self.created_at
         }
 
         // The id associated with the ticket when it was saved in the store, if it was saved.
-        pub fn id(&self) -> __ {
-           todo!()
+        pub fn id(&self) -> Option<TicketId> {
+            self.id
         }
     }
 
@@ -89,9 +101,11 @@ mod metadata {
         }
 
         Ticket {
+            id: None,
             title,
             description,
             status,
+            created_at: None,
         }
     }
 
@@ -116,7 +130,7 @@ mod metadata {
             let ticket_id = store.save(ticket.clone());
             let retrieved_ticket = store.get(&ticket_id).unwrap();
 
-            assert_eq!(Some(&ticket_id), retrieved_ticket.id());
+            assert_eq!(Some(ticket_id), retrieved_ticket.id());
             assert_eq!(&ticket.title, retrieved_ticket.title());
             assert_eq!(&ticket.description, retrieved_ticket.description());
             assert_eq!(&ticket.status, retrieved_ticket.status());
