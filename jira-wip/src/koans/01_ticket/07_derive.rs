@@ -15,7 +15,7 @@ mod derive {
     /// https://github.com/dtolnay/cargo-expand
     ///
     /// PartialEq is not the only trait whose implementation can be derived automatically!
-    #[derive(PartialEq)]
+    #[derive(PartialEq, Debug)]
     pub enum Status {
         ToDo,
         InProgress,
