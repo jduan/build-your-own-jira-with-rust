@@ -83,7 +83,7 @@ mod validation {
         #[should_panic]
         fn description_cannot_be_longer_than_3000_chars() {
             let description = (3001..10_000).fake();
-            let title = (0..50).fake();
+            let title = (1..50).fake();
 
             create_ticket(title, description, Status::ToDo);
         }
@@ -91,7 +91,7 @@ mod validation {
         #[test]
         fn valid_tickets_can_be_created() {
             let description = (0..3000).fake();
-            let title = (0..50).fake();
+            let title = (1..50).fake();
             let status = Status::Done;
 
             create_ticket(title, description, status);
