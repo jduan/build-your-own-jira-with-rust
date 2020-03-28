@@ -1,6 +1,6 @@
 mod id_generation {
-    use std::collections::HashMap;
     use super::recap::Ticket;
+    use std::collections::HashMap;
 
     /// Let's define a type-alias for our ticket id.
     /// It's a lightweight technique to add a semantic layer to the underlying data type.
@@ -20,13 +20,14 @@ mod id_generation {
     // Feel free to add more fields to `TicketStore` to solve this koan!
     struct TicketStore {
         data: HashMap<TicketId, Ticket>,
+        next_id: TicketId,
     }
 
     impl TicketStore {
-        pub fn new() -> TicketStore
-        {
+        pub fn new() -> TicketStore {
             TicketStore {
                 data: HashMap::new(),
+                next_id: 0,
             }
         }
 
@@ -45,8 +46,7 @@ mod id_generation {
         /// We want the same behaviour in our clone, IronJira.
         /// `TicketStore` will take care of generating an id for our ticket and the id
         /// will be returned by `save` after insertion.
-        pub fn save(&mut self, ticket: Ticket) -> TicketId
-        {
+        pub fn save(&mut self, ticket: Ticket) -> TicketId {
             let id = self.generate_id();
             self.data.insert(id, ticket);
             id
@@ -56,20 +56,20 @@ mod id_generation {
             self.data.get(id)
         }
 
-        fn generate_id(__) -> TicketId {
-           todo!()
+        fn generate_id(&mut self) -> TicketId {
+            self.next_id += 1;
+            self.next_id
         }
     }
 
     #[cfg(test)]
     mod tests {
-        use super::*;
         use super::super::recap::{create_ticket, Status};
-        use fake::{Faker, Fake};
+        use super::*;
+        use fake::{Fake, Faker};
 
         #[test]
-        fn a_ticket_with_a_home()
-        {
+        fn a_ticket_with_a_home() {
             let ticket = generate_ticket(Status::ToDo);
             let mut store = TicketStore::new();
 
@@ -80,8 +80,7 @@ mod id_generation {
         }
 
         #[test]
-        fn a_missing_ticket()
-        {
+        fn a_missing_ticket() {
             let ticket_store = TicketStore::new();
             let ticket_id = Faker.fake();
 
@@ -89,8 +88,7 @@ mod id_generation {
         }
 
         #[test]
-        fn id_generation_is_monotonic()
-        {
+        fn id_generation_is_monotonic() {
             let n_tickets = 100;
             let mut store = TicketStore::new();
 
