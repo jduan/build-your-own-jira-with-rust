@@ -38,8 +38,8 @@ mod metadata {
             id
         }
 
-        pub fn get(&self, id: &TicketId) -> Option<&Ticket> {
-            self.data.get(id)
+        pub fn get(&self, id: TicketId) -> Option<&Ticket> {
+            self.data.get(&id)
         }
 
         fn generate_id(&mut self) -> TicketId {
@@ -128,7 +128,7 @@ mod metadata {
             let mut store = TicketStore::new();
 
             let ticket_id = store.save(ticket.clone());
-            let retrieved_ticket = store.get(&ticket_id).unwrap();
+            let retrieved_ticket = store.get(ticket_id).unwrap();
 
             assert_eq!(Some(ticket_id), retrieved_ticket.id());
             assert_eq!(&ticket.title, retrieved_ticket.title());
@@ -142,7 +142,7 @@ mod metadata {
             let ticket_store = TicketStore::new();
             let ticket_id = Faker.fake();
 
-            assert_eq!(ticket_store.get(&ticket_id), None);
+            assert_eq!(ticket_store.get(ticket_id), None);
         }
 
         #[test]

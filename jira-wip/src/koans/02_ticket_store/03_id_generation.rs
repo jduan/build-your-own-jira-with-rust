@@ -52,8 +52,8 @@ mod id_generation {
             id
         }
 
-        pub fn get(&self, id: &TicketId) -> Option<&Ticket> {
-            self.data.get(id)
+        pub fn get(&self, id: TicketId) -> Option<&Ticket> {
+            self.data.get(&id)
         }
 
         fn generate_id(&mut self) -> TicketId {
@@ -75,7 +75,7 @@ mod id_generation {
 
             let ticket_id = store.save(ticket.clone());
 
-            assert_eq!(store.get(&ticket_id), Some(&ticket));
+            assert_eq!(store.get(ticket_id), Some(&ticket));
             assert_eq!(ticket_id, 1);
         }
 
@@ -84,7 +84,7 @@ mod id_generation {
             let ticket_store = TicketStore::new();
             let ticket_id = Faker.fake();
 
-            assert_eq!(ticket_store.get(&ticket_id), None);
+            assert_eq!(ticket_store.get(ticket_id), None);
         }
 
         #[test]

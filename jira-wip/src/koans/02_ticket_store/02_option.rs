@@ -48,8 +48,8 @@ mod option {
         ///
         /// For more details on `Option`, there is an exhaustive introduction in the Rust book:
         /// https://doc.rust-lang.org/1.29.0/book/2018-edition/ch06-01-defining-an-enum.html#the-option-enum-and-its-advantages-over-null-values
-        pub fn get(&self, id: &u32) -> Option<&Ticket> {
-            self.data.get(id)
+        pub fn get(&self, id: u32) -> Option<&Ticket> {
+            self.data.get(&id)
         }
     }
 
@@ -69,7 +69,7 @@ mod option {
 
             // Notice that, even when a ticket with the specified id exists in the store,
             // it's returned as the `Some` variant of an `Option<&Ticket>`.
-            assert_eq!(store.get(&ticket_id), Some(&ticket));
+            assert_eq!(store.get(ticket_id), Some(&ticket));
         }
 
         /// We want our `get` method to return `None` now, instead of panicking when looking for
@@ -79,7 +79,7 @@ mod option {
             let ticket_store = TicketStore::new();
             let ticket_id = Faker.fake();
 
-            assert_eq!(ticket_store.get(&ticket_id), None);
+            assert_eq!(ticket_store.get(ticket_id), None);
         }
 
         #[test]
@@ -90,10 +90,10 @@ mod option {
             let ticket_id = Faker.fake();
 
             store.save(first_ticket.clone(), ticket_id);
-            assert_eq!(store.get(&ticket_id), Some(&first_ticket));
+            assert_eq!(store.get(ticket_id), Some(&first_ticket));
 
             store.save(second_ticket.clone(), ticket_id);
-            assert_eq!(store.get(&ticket_id), Some(&second_ticket));
+            assert_eq!(store.get(ticket_id), Some(&second_ticket));
         }
 
         fn generate_ticket(status: Status) -> Ticket {
