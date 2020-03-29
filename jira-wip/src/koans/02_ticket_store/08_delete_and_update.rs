@@ -30,7 +30,7 @@ mod delete_and_update {
                 title: draft.title,
                 description: draft.description,
                 status: Status::ToDo,
-                created_at: timestamp.clone(),
+                created_at: timestamp,
                 // A new field, to keep track of the last time a ticket has been touched.
                 // It starts in sync with `created_at`, it gets updated when a ticket is updated.
                 updated_at: timestamp,
@@ -59,14 +59,36 @@ mod delete_and_update {
         /// If the `id` passed in matches a ticket in the store, we return the edited ticket.
         /// If it doesn't, we return `None`.
         pub fn update(&mut self, id: &TicketId, patch: TicketPatch) -> Option<&Ticket> {
-            todo!()
+            match self.data.get_mut(id) {
+                None => None,
+                Some(ticket) => {
+                    ticket.updated_at = Utc::now();
+                    if patch.description.is_some() {
+                        ticket.description = patch.description.unwrap();
+                    }
+                    if patch.title.is_some() {
+                        ticket.title = patch.title.unwrap();
+                    }
+                    if patch.status.is_some() {
+                        ticket.status = patch.status.unwrap();
+                    }
+
+                    Some(ticket)
+                }
+            }
         }
 
         /// If the `id` passed in matches a ticket in the store, we return the deleted ticket
         /// with some additional metadata.
         /// If it doesn't, we return `None`.
         pub fn delete(&mut self, id: &TicketId) -> Option<DeletedTicket> {
-            todo!()
+            match self.data.remove(id) {
+                None => None,
+                Some(ticket) => Some(DeletedTicket {
+                    ticket,
+                    deleted_at: Utc::now(),
+                }),
+            }
         }
 
         fn generate_id(&mut self) -> TicketId {
