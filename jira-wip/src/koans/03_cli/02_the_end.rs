@@ -1,3 +1,4 @@
+#[cfg(test)]
 mod the_end {
     /// It has been our pleasure to have you at the Rust London Code Dojo!
     ///
@@ -10,13 +11,10 @@ mod the_end {
     ///
     /// ~ See you next time! ~
     ///
-    #[cfg(test)]
-    mod the_end {
-        #[test]
-        fn the_end_of_your_journey() {
-            let i_am_done = __;
+    #[test]
+    fn the_end_of_your_journey() {
+        let i_am_done = true;
 
-            assert!(i_am_done);
-        }
+        assert!(i_am_done);
     }
 }
