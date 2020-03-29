@@ -24,18 +24,23 @@
 /// When you are ready, uncomment the appropriate lines from src/main.rs and
 /// run `cargo run --bin jira-wip` in your terminal!
 pub mod cli {
-    use super::store_recap::{TicketStore, Status, TicketDraft, TicketPatch, TicketTitle, TicketDescription};
     use super::id_generation::TicketId;
+    use super::store_recap::{
+        Status, TicketDescription, TicketDraft, TicketPatch, TicketStore, TicketTitle,
+    };
     use std::error::Error;
-    use std::str::FromStr;
     use std::fmt::Formatter;
+    use std::str::FromStr;
 
     #[derive(structopt::StructOpt, Clone)]
     /// A small command-line interface to interact with a toy Jira clone, IronJira.
     pub enum Command {
         /// Create a ticket on your board.
         Create {
-            __
+            #[structopt(long)]
+            description: TicketDescription,
+            #[structopt(long)]
+            title: TicketTitle,
         },
         /// Edit the details of an existing ticket.
         Edit {
@@ -53,9 +58,7 @@ pub mod cli {
             title: Option<TicketTitle>,
         },
         /// Delete a ticket from the store passing the ticket id.
-        Delete {
-            __
-        },
+        Delete { ticket_id: TicketId },
         /// List all existing tickets.
         List,
     }
@@ -69,23 +72,43 @@ pub mod cli {
         type Err = ParsingError;
 
         fn from_str(s: &str) -> Result<Self, Self::Err> {
-            __
+            match s {
+                "ToDo" => Ok(Status::ToDo),
+                "InProgress" => Ok(Status::InProgress),
+                "Blocked" => Ok(Status::Blocked),
+                "Done" => Ok(Status::Done),
+                _ => Err(ParsingError("Invalid status".into())),
+            }
         }
     }
 
     impl FromStr for TicketTitle {
-        __
+        type Err = ParsingError;
+
+        fn from_str(s: &str) -> Result<Self, Self::Err> {
+            match TicketTitle::new(s.into()) {
+                Ok(title) => Ok(title),
+                Err(err) => Err(ParsingError(err.to_string())),
+            }
+        }
     }
 
     impl FromStr for TicketDescription {
-        __
+        type Err = ParsingError;
+
+        fn from_str(s: &str) -> Result<Self, Self::Err> {
+            match TicketDescription::new(s.into()) {
+                Ok(description) => Ok(description),
+                Err(err) => Err(ParsingError(err.to_string())),
+            }
+        }
     }
 
     /// Our error struct for parsing failures.
     #[derive(Debug)]
     pub struct ParsingError(String);
 
-    impl Error for ParsingError { }
+    impl Error for ParsingError {}
 
     impl std::fmt::Display for ParsingError {
         fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -102,10 +125,14 @@ pub mod cli {
     /// touching in this workshop.
     /// Check its section in the Rust book if you are curious:
     /// https://doc.rust-lang.org/book/ch17-02-trait-objects.html#using-trait-objects-that-allow-for-values-of-different-types
-    pub fn handle_command(ticket_store: &mut TicketStore, command: Command) -> Result<(), Box<dyn Error>> {
+    pub fn handle_command(
+        ticket_store: &mut TicketStore,
+        command: Command,
+    ) -> Result<(), Box<dyn Error>> {
         match command {
             Command::Create { description, title } => {
-                todo!()
+                let draft = TicketDraft { title, description };
+                ticket_store.save(draft);
             }
             Command::Edit {
                 id,
@@ -113,7 +140,12 @@ pub mod cli {
                 description,
                 status,
             } => {
-                todo!()
+                let patch = TicketPatch {
+                    title,
+                    description,
+                    status,
+                };
+                ticket_store.update(&id, patch);
             }
             Command::Delete { ticket_id } => match ticket_store.delete(&ticket_id) {
                 Some(deleted_ticket) => println!(
@@ -126,7 +158,14 @@ pub mod cli {
                 ),
             },
             Command::List => {
-                todo!()
+                let tickets = ticket_store.list();
+                if tickets.is_empty() {
+                    println!("There's no tickets yet!");
+                } else {
+                    for ticket in tickets {
+                        println!("{:?}", ticket);
+                    }
+                }
             }
         }
         Ok(())
@@ -137,8 +176,7 @@ pub mod cli {
         use super::*;
 
         #[test]
-        fn invalid_status_fails_to_be_parsed()
-        {
+        fn invalid_status_fails_to_be_parsed() {
             let invalid_status = "Not a good status";
             assert!(Status::from_str(invalid_status).is_err());
         }

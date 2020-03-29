@@ -8,7 +8,6 @@
 pub mod store_recap {
     use super::id_generation::TicketId;
     use chrono::{DateTime, Utc};
-    use serde::{Deserialize, Serialize};
     use std::collections::HashMap;
     use std::error::Error;
 

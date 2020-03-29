@@ -15,12 +15,8 @@ use std::path::PathBuf;
 ///
 /// Brace yourself!
 fn main() -> Result<(), Box<dyn Error>> {
-    // Uncomment these lines after 02_ticket_store/09_store_recap
-    /*
-       // Comment these line after 03_cli/01_persistence
-       use path_to_enlightenment::store_recap::TicketStore;
-       let mut ticket_store = TicketStore::new();
-    */
+    use path_to_enlightenment::store_recap::TicketStore;
+    let mut ticket_store = TicketStore::new();
 
     // Uncomment these lines after 03_cli/01_persistence
     /*
@@ -29,13 +25,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         let mut ticket_store = load(&data_store_filename());
     */
 
-    // Uncomment these lines after 03_cli/00_cli
-    /*
-        use path_to_enlightenment::cli::{Command, handle_command};
-        // Parse the command-line arguments.
-        let command = <Command as paw::ParseArgs>::parse_args()?;
-        handle_command(&mut ticket_store, command)?;
-    */
+    use path_to_enlightenment::cli::{handle_command, Command};
+    // Parse the command-line arguments.
+    let command = <Command as paw::ParseArgs>::parse_args()?;
+    handle_command(&mut ticket_store, command)?;
 
     // Uncomment these lines after 03_cli/01_persistence
     /*
