@@ -51,9 +51,7 @@ pub mod persistence {
 
     #[cfg(test)]
     mod tests {
-        use super::super::store_recap::{
-            Status, TicketDescription, TicketDraft, TicketStore, TicketTitle,
-        };
+        use super::super::store_recap::{TicketDescription, TicketDraft, TicketStore, TicketTitle};
         use super::*;
         use fake::Fake;
         use tempfile::NamedTempFile;

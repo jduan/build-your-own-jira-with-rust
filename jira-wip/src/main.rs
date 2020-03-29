@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 #![allow(unused_doc_comments)]
 use directories::ProjectDirs;
+use path_to_enlightenment::persistence::{load, save};
 use std::error::Error;
 use std::path::PathBuf;
 
@@ -15,26 +16,16 @@ use std::path::PathBuf;
 ///
 /// Brace yourself!
 fn main() -> Result<(), Box<dyn Error>> {
-    use path_to_enlightenment::store_recap::TicketStore;
-    let mut ticket_store = TicketStore::new();
-
-    // Uncomment these lines after 03_cli/01_persistence
-    /*
-        use path_to_enlightenment::persistence::{save, load};
-        // Load the store from disk. If missing, a brand new one will be created.
-        let mut ticket_store = load(&data_store_filename());
-    */
+    // Load the store from disk. If missing, a brand new one will be created.
+    let mut ticket_store = load(&data_store_filename());
 
     use path_to_enlightenment::cli::{handle_command, Command};
     // Parse the command-line arguments.
     let command = <Command as paw::ParseArgs>::parse_args()?;
     handle_command(&mut ticket_store, command)?;
 
-    // Uncomment these lines after 03_cli/01_persistence
-    /*
-        // Save the store state to disk after we have completed our action.
-        save(&ticket_store, &data_store_filename());
-    */
+    // Save the store state to disk after we have completed our action.
+    save(&ticket_store, &data_store_filename());
     Ok(())
 }
 
